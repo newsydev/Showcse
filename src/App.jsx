@@ -50,7 +50,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      <Navbar submissionCount={projects.length} onSearchFocus={() => searchRef.current?.focus()} />
+      <Navbar onSearchFocus={() => searchRef.current?.focus()} />
 
       <main className="w-full min-h-[calc(100vh-14rem)]">
         <Hero />
