@@ -30,56 +30,65 @@ import { useState, useEffect } from 'react';
  *  Z(25): YouTube Video Demonstration URL
  */
 
-function parseCSVLine(line) {
-  const cols = [];
-  let current = '';
+function cleanUrl(url) {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed || trimmed === '.' || trimmed === '-' || trimmed.toLowerCase() === 'na' || trimmed.toLowerCase() === 'n/a') {
+    return null;
+  }
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+  if (/^[\w.-]+\.[a-z]{2,}/i.test(trimmed)) {
+    return `https://${trimmed}`;
+  }
+  return null;
+}
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cell = '';
   let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
     if (ch === '"') {
-      // Handle escaped double-quotes inside quoted fields
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"';
+      if (inQuotes && text[i + 1] === '"') {
+        cell += '"';
         i++;
       } else {
         inQuotes = !inQuotes;
       }
     } else if (ch === ',' && !inQuotes) {
-      cols.push(current.trim());
-      current = '';
+      row.push(cell.trim());
+      cell = '';
+    } else if ((ch === '\r' || ch === '\n') && !inQuotes) {
+      if (ch === '\r' && text[i + 1] === '\n') {
+        i++;
+      }
+      row.push(cell.trim());
+      cell = '';
+      if (row.length > 0 && row.some(c => c.length > 0)) {
+        rows.push(row);
+      }
+      row = [];
     } else {
-      current += ch;
+      cell += ch;
     }
   }
-  cols.push(current.trim());
-  return cols;
-}
 
-function parseCSV(text) {
-  // Split into lines, but keep quoted newlines together
-  const lines = [];
-  let current = '';
-  let inQuotes = false;
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i];
-    if (ch === '"') {
-      if (inQuotes && text[i + 1] === '"') { current += '"'; i++; }
-      else { inQuotes = !inQuotes; current += ch; }
-    } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
-      if (current.trim()) lines.push(current);
-      current = '';
-      if (ch === '\r' && text[i + 1] === '\n') i++;
-    } else {
-      current += ch;
+  if (cell || row.length > 0) {
+    row.push(cell.trim());
+    if (row.some(c => c.length > 0)) {
+      rows.push(row);
     }
   }
-  if (current.trim()) lines.push(current);
 
-  if (lines.length < 2) return [];
+  if (rows.length < 2) return [];
 
   // Skip header row
-  return lines.slice(1).map((line, rowIndex) => {
-    const cols = parseCSVLine(line);
+  return rows.slice(1).map((cols, rowIndex) => {
     const get = (i) => (cols[i] || '').replace(/^"|"$/g, '').trim();
 
     // Build member list — skip blank or "NA" members
@@ -102,12 +111,12 @@ function parseCSV(text) {
     const teamNum    = String(rowIndex + 1).padStart(2, '0');
     const timestamp  = get(0);
     const dataset    = get(19);
-    const datasetUrl = get(20);
+    const datasetUrl = cleanUrl(get(20));
     const target     = get(21);
     const problem    = get(22);
-    const github     = get(23);
-    const colab      = get(24);
-    const youtube    = get(25);
+    const github     = cleanUrl(get(23));
+    const colab      = cleanUrl(get(24));
+    const youtube    = cleanUrl(get(25));
 
     return {
       id,
