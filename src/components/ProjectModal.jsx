@@ -3,17 +3,38 @@ import { useEffect } from 'react';
 const monoStyle = { fontFamily: 'JetBrains Mono, monospace' };
 const geistStyle = { fontFamily: 'Geist, sans-serif' };
 
-function ActionLink({ href, icon, label, className = '' }) {
+function YouTubeIcon({ className = "w-4 h-4" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="#FF0000">
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+    </svg>
+  );
+}
+
+function ActionLink({ href, icon, label, variant = 'slate', isYoutube = false }) {
   if (!href) return null;
+
+  const styles = {
+    slate: 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200',
+    amber: 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200',
+    rose: 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200',
+    red: 'bg-red-50 hover:bg-red-100 text-red-700 border-red-200',
+    youtube: 'bg-red-50 hover:bg-red-100 text-[#b91c1c] border-red-200',
+  };
+
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] transition-colors ${className}`}
-      style={{ ...monoStyle, fontSize: 11 }}
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all shadow-2xs ${styles[variant] || styles.slate}`}
+      style={monoStyle}
     >
-      <span className="material-symbols-outlined text-[15px]">{icon}</span>
+      {isYoutube ? (
+        <YouTubeIcon className="w-4 h-4 shrink-0" />
+      ) : (
+        <span className="material-symbols-outlined text-[15px]">{icon}</span>
+      )}
       <span>{label}</span>
     </a>
   );
@@ -29,173 +50,143 @@ export default function ProjectModal({ project, onClose }) {
 
   if (!project) return null;
 
-  const isSheetProject = !!project.members;
-
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-12 bg-black/75 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-xs"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg bg-[#161b22] border border-[#30363d] shadow-2xl flex flex-col">
-        {/* Sticky header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between p-3.5 bg-[#161b22] border-b border-[#30363d]">
+      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white border-2 border-blue-900 shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-150">
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-white/95 backdrop-blur-md border-b border-blue-100">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#58a6ff] text-[18px]">terminal</span>
-            <span className="font-semibold text-[#f0f6fc]" style={{ ...monoStyle, fontSize: 12 }}>
+            <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-900 font-bold border border-blue-200 text-xs font-mono">
               {project.team} // {project.teamCode}
             </span>
-            {!isSheetProject && (
-              <>
-                <span className="text-[#6e7681]" style={monoStyle}>•</span>
-                <span className="px-1.5 py-0.5 rounded bg-[#21262d] text-[#8b949e] border border-[#30363d]" style={{ ...monoStyle, fontSize: 11 }}>
-                  {project.institution}
-                </span>
-              </>
-            )}
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Verified Submission
+            </span>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded hover:bg-[#21262d] text-[#8b949e] hover:text-[#f0f6fc] flex items-center justify-center transition-colors">
-            <span className="material-symbols-outlined text-[18px]">close</span>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
-        {/* Body */}
-        <div className="p-5 flex flex-col gap-5">
+        {/* Modal Body */}
+        <div className="p-6 flex flex-col gap-5 text-slate-800">
+          {/* Team Name */}
+          <div>
+            <h2
+              className="font-bold text-slate-900 text-2xl tracking-tight"
+              style={{ fontFamily: 'Hanken Grotesk, sans-serif' }}
+            >
+              {project.teamName}
+            </h2>
+            <span className="text-slate-400 text-xs font-mono mt-0.5 block">
+              {project.members?.length || 0} Team Contributors • {project.timestamp || 'Verified Entry'}
+            </span>
+          </div>
 
-          {/* ── SHEET PROJECT LAYOUT ── */}
-          {isSheetProject ? (
-            <>
-              {/* Team name + submission badge */}
-              <div className="flex items-start justify-between flex-wrap gap-2">
-                <div>
-                  <h2 className="font-bold text-[#f0f6fc]" style={{ fontFamily: 'Hanken Grotesk, sans-serif', fontSize: 22, letterSpacing: '-0.015em' }}>
-                    {project.teamName}
-                  </h2>
-                  <span className="text-[#6e7681]" style={{ ...monoStyle, fontSize: 10 }}>TEAM SUBMISSION • {project.members.length} MEMBERS</span>
-                </div>
-                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#238636]/15 text-[#3fb950] border border-[#238636]/30" style={{ ...monoStyle, fontSize: 11 }}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#238636]" /> SUBMITTED
-                </div>
-              </div>
+          {/* Problem Statement */}
+          {project.problemStatement && (
+            <div className="flex flex-col gap-1.5">
+              <span className="text-slate-400 uppercase tracking-wider text-[10px] font-semibold font-mono">
+                Problem Statement & Objective
+              </span>
+              <p
+                className="text-slate-700 leading-relaxed text-xs sm:text-sm p-3.5 rounded-xl bg-slate-50 border border-slate-200 whitespace-pre-line"
+                style={geistStyle}
+              >
+                {project.problemStatement}
+              </p>
+            </div>
+          )}
 
-              {/* Problem Statement */}
-              {project.problemStatement && (
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-[#6e7681] uppercase tracking-wider" style={{ ...monoStyle, fontSize: 10 }}>Problem Statement</span>
-                  <p className="text-[#c9d1d9] leading-relaxed" style={{ ...geistStyle, fontSize: 14 }}>
-                    {project.problemStatement}
-                  </p>
-                </div>
-              )}
-
-              {/* Dataset */}
-              {project.datasetName && (
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-[#6e7681] uppercase tracking-wider" style={{ ...monoStyle, fontSize: 10 }}>Dataset</span>
-                  <div className="flex items-center gap-2 p-3 rounded bg-[#0d1117] border border-[#30363d]">
-                    <span className="material-symbols-outlined text-[#58a6ff] text-[18px]">dataset</span>
-                    <div className="flex flex-col">
-                      <span className="text-[#f0f6fc] font-medium" style={{ ...geistStyle, fontSize: 13 }}>{project.datasetName}</span>
-                      {project.datasetUrl && (
-                        <a href={project.datasetUrl} target="_blank" rel="noopener noreferrer"
-                          className="text-[#58a6ff] hover:text-blue-300 transition-colors truncate max-w-xs"
-                          style={{ ...monoStyle, fontSize: 10 }}>
-                          {project.datasetUrl}
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Members table */}
-              <div className="flex flex-col gap-2">
-                <span className="text-[#6e7681] uppercase tracking-wider" style={{ ...monoStyle, fontSize: 10 }}>Team Members</span>
-                <div className="rounded-lg border border-[#30363d] divide-y divide-[#30363d] overflow-hidden">
-                  {/* Table header */}
-                  <div className="grid grid-cols-4 px-3 py-2 bg-[#0d1117]" style={{ ...monoStyle, fontSize: 10 }}>
-                    <span className="text-[#6e7681] uppercase">Name</span>
-                    <span className="text-[#6e7681] uppercase">Roll No</span>
-                    <span className="text-[#6e7681] uppercase">Email</span>
-                    <span className="text-[#6e7681] uppercase">Phone</span>
-                  </div>
-                  {project.members.map((m, i) => (
-                    <div key={i} className="grid grid-cols-4 px-3 py-2.5 hover:bg-[#21262d]/30 transition-colors" style={{ ...geistStyle, fontSize: 12 }}>
-                      <span className="text-[#f0f6fc] font-medium truncate pr-2">{m.name}</span>
-                      <span className="text-[#8b949e] truncate pr-2" style={monoStyle}>{m.rollNo || '—'}</span>
-                      <span className="text-[#8b949e] truncate pr-2">{m.email || '—'}</span>
-                      <span className="text-[#8b949e] truncate" style={monoStyle}>{m.phone || '—'}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* External Links */}
-              <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-[#30363d]">
-                <ActionLink href={project.githubUrl} icon="code" label="GitHub Repository" className="text-[#c9d1d9]" />
-                <ActionLink href={project.colabUrl} icon="science" label="Google Colab" className="text-[#e3b341]" />
-                <ActionLink href={project.youtubeUrl} icon="play_circle" label="YouTube Demo" className="text-[#f87171]" />
+          {/* Dataset & Target Variable */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {project.datasetName && (
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-slate-400 uppercase font-mono text-[10px] font-semibold block mb-1">
+                  Dataset
+                </span>
+                <span className="font-semibold text-slate-900 text-xs sm:text-sm block truncate">
+                  {project.datasetName}
+                </span>
                 {project.datasetUrl && (
-                  <ActionLink href={project.datasetUrl} icon="dataset" label="Dataset" className="text-[#58a6ff]" />
+                  <a
+                    href={project.datasetUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline text-xs font-medium inline-flex items-center gap-1 mt-1"
+                  >
+                    <span>View Dataset</span>
+                    <span className="material-symbols-outlined text-[13px]">open_in_new</span>
+                  </a>
                 )}
               </div>
-            </>
-          ) : (
-            /* ── STATIC PROJECT LAYOUT (original) ── */
-            <>
-              {/* Preview */}
-              <div className="relative w-full aspect-video rounded bg-[#0a0d12] overflow-hidden border border-[#30363d] flex items-center justify-center">
-                {project.previewType === 'image' ? (
-                  <img src={project.previewImage} alt={project.title} className="w-full h-full object-cover opacity-90" />
-                ) : (
-                  <div className="w-full h-full flex flex-col justify-center items-center gap-2">
-                    <span className="material-symbols-outlined text-[48px] text-[#30363d]">terminal</span>
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-[#0a0d12]/40 flex items-center justify-center">
-                  <button className="w-14 h-14 rounded-full bg-[#1f6feb] hover:bg-blue-600 flex items-center justify-center shadow-md hover:scale-105 transition-transform">
-                    <span className="material-symbols-outlined text-[26px] text-white">play_arrow</span>
-                  </button>
-                </div>
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
-                  <span className="text-[#c9d1d9] font-medium tracking-wider" style={{ ...monoStyle, fontSize: 11 }}>LAUNCH RECORDED RUN (3:45)</span>
-                </div>
-              </div>
+            )}
 
-              {/* Title */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <h2 className="font-bold text-[#f0f6fc]" style={{ fontFamily: 'Hanken Grotesk, sans-serif', fontSize: 22, letterSpacing: '-0.015em' }}>
-                    {project.title}
-                  </h2>
-                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#238636]/15 text-[#3fb950] border border-[#238636]/30" style={{ ...monoStyle, fontSize: 11 }}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#238636]" /> JURY CERTIFIED
-                  </div>
-                </div>
-                <p className="text-sm text-[#8b949e]" style={geistStyle}>{project.fullDesc}</p>
+            {project.targetVariable && (
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-slate-400 uppercase font-mono text-[10px] font-semibold block mb-1">
+                  Target Variable
+                </span>
+                <span className="font-mono font-semibold text-blue-900 text-xs sm:text-sm block truncate">
+                  {project.targetVariable}
+                </span>
+                <span className="text-slate-400 text-[11px] block mt-1">Supervised Target</span>
               </div>
+            )}
+          </div>
 
-              {/* Tags */}
-              <div className="flex flex-wrap gap-1.5">
-                {project.tags.map((tag) => (
-                  <span key={tag} className={`px-2 py-0.5 rounded bg-[#21262d] border border-[#30363d] ${project.tagColors?.[tag] || 'text-[#8b949e]'}`} style={{ ...monoStyle, fontSize: 11 }}>
-                    {tag}
-                  </span>
+          {/* Team Members List */}
+          {project.members && project.members.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <span className="text-slate-400 uppercase tracking-wider font-semibold font-mono text-[10px]">
+                Team Members ({project.members.length})
+              </span>
+              <div className="rounded-xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
+                <div className="grid grid-cols-12 bg-slate-50 px-3.5 py-2 font-mono text-[11px] text-slate-500 font-semibold uppercase">
+                  <span className="col-span-4">Name</span>
+                  <span className="col-span-4">Roll No</span>
+                  <span className="col-span-4">Contact</span>
+                </div>
+                {project.members.map((m, i) => (
+                  <div key={i} className="grid grid-cols-12 px-3.5 py-2.5 items-center text-xs hover:bg-slate-50 transition-colors">
+                    <span className="col-span-4 font-semibold text-slate-900 truncate pr-2">{m.name}</span>
+                    <span className="col-span-4 font-mono text-slate-600 text-[11px] truncate pr-2">{m.rollNo || '—'}</span>
+                    <span className="col-span-4 text-slate-500 truncate text-[11px] font-mono">
+                      {m.phone || m.email || '—'}
+                    </span>
+                  </div>
                 ))}
               </div>
-
-              {/* Actions */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#30363d]">
-                <div className="flex items-center gap-2">
-                  <ActionLink href="#" icon="terminal" label="Repository" className="text-[#c9d1d9]" />
-                  <ActionLink href="#" icon="schema" label="Database Schema" className="text-[#c9d1d9]" />
-                </div>
-                <a href="#" className="inline-flex items-center gap-1 px-4 py-1.5 rounded bg-[#1f6feb] hover:bg-blue-600 text-white font-semibold shadow-sm transition-colors text-xs" style={geistStyle}>
-                  <span>Open Live Deployment</span>
-                  <span className="material-symbols-outlined text-[14px]">open_in_new</span>
-                </a>
-              </div>
-            </>
+            </div>
           )}
+
+          {/* Links */}
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+            <ActionLink href={project.githubUrl} icon="code" label="GitHub Repository" variant="slate" />
+            <ActionLink href={project.colabUrl} icon="science" label="Google Colab" variant="amber" />
+            <ActionLink href={project.youtubeUrl} isYoutube label="YouTube Video" variant="youtube" />
+            {project.datasetUrl && (
+              <ActionLink href={project.datasetUrl} icon="dataset" label="Dataset Source" variant="slate" />
+            )}
+          </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+          <span className="text-xs text-slate-400 font-mono">Machine Learning Practical Assignment</span>
+          <button
+            onClick={onClose}
+            className="px-4 py-1.5 rounded-lg bg-blue-900 hover:bg-blue-800 text-white text-xs font-semibold transition-colors cursor-pointer"
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>
