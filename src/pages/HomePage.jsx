@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import FilterBar from '../components/FilterBar';
 import ProjectGrid from '../components/ProjectGrid';
 import AboutSection from '../components/AboutSection';
-import { LoadingState, ErrorState, SheetNotConfigured } from '../components/SheetStates';
+import { ErrorState, SheetNotConfigured } from '../components/SheetStates';
+import { SkeletonGrid } from '../components/SkeletonGrid';
 import { useFilters } from '../hooks/useFilters';
 import { useProjects } from '../context/ProjectsContext';
 
@@ -55,7 +56,7 @@ export default function HomePage() {
         {!isConfigured ? (
           <SheetNotConfigured />
         ) : isLoading ? (
-          <LoadingState />
+          <SkeletonGrid count={9} />
         ) : error ? (
           <ErrorState message={error} onRetry={refetch} />
         ) : (

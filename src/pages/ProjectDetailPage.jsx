@@ -2,7 +2,8 @@ import { useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useProjects } from '../context/ProjectsContext';
 import Navbar from '../components/Navbar';
-import { LoadingState, ErrorState, SheetNotConfigured } from '../components/SheetStates';
+import { ErrorState, SheetNotConfigured } from '../components/SheetStates';
+import { SkeletonGrid } from '../components/SkeletonGrid';
 
 const monoStyle  = { fontFamily: 'JetBrains Mono, monospace' };
 const geistStyle = { fontFamily: 'Geist, sans-serif' };
@@ -71,7 +72,7 @@ export default function ProjectDetailPage() {
     return (
       <div className="min-h-screen bg-white">
         <Navbar />
-        <LoadingState />
+        <SkeletonGrid count={1} />
       </div>
     );
   }
