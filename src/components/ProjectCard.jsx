@@ -1,4 +1,6 @@
-const monoStyle = { fontFamily: 'JetBrains Mono, monospace' };
+import { Link } from 'react-router-dom';
+
+const monoStyle  = { fontFamily: 'JetBrains Mono, monospace' };
 const geistStyle = { fontFamily: 'Geist, sans-serif' };
 
 function YouTubeIcon({ className = "w-3.5 h-3.5" }) {
@@ -38,22 +40,22 @@ function LinkBtn({ href, icon, label, variant = 'slate', isYoutube = false }) {
   );
 }
 
-export default function ProjectCard({ project, onInspect }) {
+export default function ProjectCard({ project }) {
   if (project.members) {
-    return <SheetCard project={project} onInspect={onInspect} />;
+    return <SheetCard project={project} />;
   }
-  return <StaticCard project={project} onInspect={onInspect} />;
+  return <StaticCard project={project} />;
 }
 
 /** Card layout for Google Sheet submissions - Dark blue borderline, white inside */
-function SheetCard({ project, onInspect }) {
+function SheetCard({ project }) {
   const teamNum = project.team;
   const memberCount = project.members?.length || 0;
 
   return (
-    <div
+    <Link
+      to={`/project/${project.id}`}
       className="group relative rounded-2xl bg-white border-2 border-blue-900 hover:border-blue-700 hover:shadow-lg transition-all duration-200 flex flex-col justify-between overflow-hidden shadow-xs cursor-pointer"
-      onClick={() => onInspect(project)}
     >
       {/* Card Body */}
       <div className="p-5 flex flex-col gap-3.5 flex-1 bg-white">
@@ -153,24 +155,21 @@ function SheetCard({ project, onInspect }) {
           <LinkBtn href={project.colabUrl} icon="science" label="Colab" variant="amber" />
           <LinkBtn href={project.youtubeUrl} isYoutube label="YouTube" variant="youtube" />
         </div>
-        <button
-          onClick={(e) => { e.stopPropagation(); onInspect(project); }}
-          className="ml-auto inline-flex items-center gap-1 text-xs font-bold text-blue-900 hover:text-blue-700 transition-colors cursor-pointer group-hover:translate-x-0.5"
-        >
+        <span className="ml-auto inline-flex items-center gap-1 text-xs font-bold text-blue-900 group-hover:text-blue-700 transition-colors group-hover:translate-x-0.5">
           <span>Details</span>
           <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
-        </button>
+        </span>
       </div>
-    </div>
+    </Link>
   );
 }
 
 /** Fallback static card with dark blue border and white inner */
-function StaticCard({ project, onInspect }) {
+function StaticCard({ project }) {
   return (
-    <div
+    <Link
+      to={`/project/${project.id}`}
       className="group relative rounded-2xl bg-white border-2 border-blue-900 hover:border-blue-700 hover:shadow-lg transition-all duration-200 flex flex-col justify-between overflow-hidden shadow-xs cursor-pointer p-5"
-      onClick={() => onInspect(project)}
     >
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between" style={{ ...monoStyle, fontSize: 11 }}>
@@ -186,10 +185,10 @@ function StaticCard({ project, onInspect }) {
       </div>
       <div className="mt-4 pt-3 border-t border-blue-100 flex items-center justify-between">
         <span className="text-xs text-slate-400 font-mono">Static Artifact</span>
-        <button className="text-xs font-bold text-blue-900 hover:text-blue-700">
+        <span className="text-xs font-bold text-blue-900 group-hover:text-blue-700">
           Inspect →
-        </button>
+        </span>
       </div>
-    </div>
+    </Link>
   );
 }
